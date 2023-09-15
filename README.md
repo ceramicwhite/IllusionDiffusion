@@ -1,6 +1,6 @@
 ---
 title: IllusionDiffusion
-emoji: 💻
+emoji: 👁
 colorFrom: red
 colorTo: pink
 sdk: gradio

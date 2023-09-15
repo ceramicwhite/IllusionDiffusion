@@ -53,10 +53,10 @@ def inference(
         negative_prompt=negative_prompt,
         image=None,
         control_image=control_image,
-        guidance_scale=float(guidance_scale),
-        controlnet_conditioning_scale=float(controlnet_conditioning_scale),
+        guidance_scale=guidance_scale,
+        controlnet_conditioning_scale=controlnet_conditioning_scale,
         generator=generator,
-        strength=float(strength),
+        strength=strength,
         num_inference_steps=40,
     )
     return out.images[0]
@@ -65,7 +65,6 @@ with gr.Blocks() as app:
     gr.Markdown(
         '''
         # Illusion Diffusion 🌀
-        ## Generate beautiful illusion art with SD 1.5.
         **[Follow me on Twitter](https://twitter.com/angrypenguinPNG)**
         '''
     )

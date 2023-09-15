@@ -47,6 +47,8 @@ def inference(
     
     # Generate init_image using the "Realistic Vision V2.0" model
     init_image = pipe(prompt, height=512, width=512).images[0]
+    print("Init Image:", init_image)
+    assert init_image is not None, "init_image is None!"
     
     control_image = control_image.resize((512, 512))
     pipe.scheduler = SAMPLER_MAP[sampler](pipe.scheduler.config)

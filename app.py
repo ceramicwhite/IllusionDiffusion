@@ -56,7 +56,7 @@ def inference(
         controlnet_conditioning_scale=controlnet_conditioning_scale,
         generator=generator,
         strength=strength,
-        num_inference_steps=40,
+        num_inference_steps=30,
     )
     return out.images[0]
 
@@ -64,13 +64,14 @@ with gr.Blocks() as app:
     gr.Markdown(
         '''
         # Illusion Diffusion 🌀
+        ## Generate stunning illusion artwork with Stable Diffusion
         **[Follow me on Twitter](https://twitter.com/angrypenguinPNG)**
         '''
     )
     
     with gr.Row():
         with gr.Column():
-            control_image = gr.Image(label="Control Image", type="pil")
+            control_image = gr.Image(label="Input Illusion", type="pil")
             prompt = gr.Textbox(label="Prompt")
             negative_prompt = gr.Textbox(label="Negative Prompt", value="ugly, disfigured, low quality, blurry, nsfw")
             with gr.Accordion(label="Advanced Options", open=False):
@@ -93,3 +94,5 @@ app.queue(concurrency_count=4, max_size=20)
 
 if __name__ == "__main__":
     app.launch(debug=True)
+
+

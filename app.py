@@ -104,7 +104,7 @@ with gr.Blocks() as app:
             controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=0.8, label="Illusion strength", info="ControlNet conditioning scale")
             gr.Examples(examples=["checkers.png", "pattern.png", "spiral.jpeg"], inputs=control_image)
             prompt = gr.Textbox(label="Prompt")
-            negative_prompt = gr.Textbox(label="Negative Prompt", value="ugly, disfigured, low quality, blurry, nsfw")
+            negative_prompt = gr.Textbox(label="Negative Prompt", value="low quality")
             with gr.Accordion(label="Advanced Options", open=False):
                 #strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, value=0.9, label="Strength")
                 guidance_scale = gr.Slider(minimum=0.0, maximum=50.0, step=0.25, value=7.5, label="Guidance Scale")

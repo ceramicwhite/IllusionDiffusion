@@ -6,6 +6,8 @@ from diffusers import (
     DiffusionPipeline,
     StableDiffusionControlNetImg2ImgPipeline,
     ControlNetModel,
+    DPMSolverMultistepScheduler,  # <-- Added import
+    EulerDiscreteScheduler  # <-- Added import
 )
 
 # Initialize both pipelines

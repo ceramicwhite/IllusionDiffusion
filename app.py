@@ -86,7 +86,7 @@ with gr.Blocks() as app:
             
     run_btn.click(
         inference,
-        inputs=[input_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, strength, seed, sampler],
+        inputs=[prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, strength, seed, sampler],
         outputs=[result_image]
     )
 

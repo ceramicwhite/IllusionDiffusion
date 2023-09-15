@@ -4,8 +4,9 @@ import gradio as gr
 from PIL import Image
 from diffusers import (
     DiffusionPipeline,
-    StableDiffusionControlNetImg2ImgPipeline,
+    StableDiffusionControlNetPipeline,
     ControlNetModel,
+    StableDiffusionLatentUpscalePipeline,
     DPMSolverMultistepScheduler,  # <-- Added import
     EulerDiscreteScheduler  # <-- Added import
 )
@@ -13,18 +14,38 @@ from diffusers import (
 # Initialize both pipelines
 init_pipe = DiffusionPipeline.from_pretrained("SG161222/Realistic_Vision_V2.0", torch_dtype=torch.float16).to("cuda")
 controlnet = ControlNetModel.from_pretrained("monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16)
-main_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+main_pipe = StableDiffusionControlNetPipeline.from_pretrained(
     "SG161222/Realistic_Vision_V2.0",
     controlnet=controlnet,
     safety_checker=None,
     torch_dtype=torch.float16,
 ).to("cuda")
+model_id = "stabilityai/sd-x2-latent-upscaler"
+upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+upscaler.to("cuda")
+
 
 # Sampler map
 SAMPLER_MAP = {
     "DPM++ Karras SDE": lambda config: DPMSolverMultistepScheduler.from_config(config, use_karras=True, algorithm_type="sde-dpmsolver++"),
     "Euler": lambda config: EulerDiscreteScheduler.from_config(config),
 }
+
+def center_crop_resize(img, output_size=(512, 512)):
+    width, height = img.size
+
+    # Calculate dimensions to crop to the center
+    new_dimension = min(width, height)
+    left = (width - new_dimension)/2
+    top = (height - new_dimension)/2
+    right = (width + new_dimension)/2
+    bottom = (height + new_dimension)/2
+
+    # Crop and resize
+    img = img.crop((left, top, right, bottom))
+    img = img.resize(output_size)
+
+    return img
 
 # Inference function
 def inference(
@@ -33,49 +54,46 @@ def inference(
     negative_prompt: str,
     guidance_scale: float = 8.0,
     controlnet_conditioning_scale: float = 1,
-    strength: float = 0.9,
     seed: int = -1,
     sampler = "DPM++ Karras SDE",
+    progress = gr.Progress(track_tqdm=True)
 ):
     if prompt is None or prompt == "":
         raise gr.Error("Prompt is required")
     
     # Generate the initial image
-    init_image = init_pipe(prompt).images[0]
+    #init_image = init_pipe(prompt).images[0]
 
     # Rest of your existing code
-    control_image = control_image.resize((512, 512))
+    control_image = center_crop_resize(control_image)
     main_pipe.scheduler = SAMPLER_MAP[sampler](main_pipe.scheduler.config)
     generator = torch.manual_seed(seed) if seed != -1 else torch.Generator()
 
     out = main_pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
-        image=init_image,
-        control_image=control_image,
-        guidance_scale=guidance_scale,
-        controlnet_conditioning_scale=controlnet_conditioning_scale,
+        image=control_image,
+        #control_image=control_image,
+        guidance_scale=float(guidance_scale),
+        controlnet_conditioning_scale=float(controlnet_conditioning_scale),
         generator=generator,
-        strength=strength,
+        #strength=strength,
         num_inference_steps=30,
-    )
-    return out.images[0]
+        #output_type="latent"
+    ).images[0]
+    
+    return out
 
 with gr.Blocks() as app:
     gr.Markdown(
         '''
-        <center>
-
-        <span style="color:blue; font-size:24px;">Illusion Diffusion 🌀</span>  
-        <span style="color:black; font-size:16px;">Generate stunning illusion artwork with Stable Diffusion</span>  
-        <span style="color:black; font-size:10px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)</span>  
-        
+        <center><h1>Illusion Diffusion 🌀</h1></span>  
+        <span font-size:16px;">Generate stunning illusion artwork with Stable Diffusion</span>  
+        <span font-size:10px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)</span>
         </center>
 
-        <p style="text-align:center;">
-        <span style="color:black; font-size:10px;">This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
-        Given a prompt, we generate an init image and pass that alongside the control illusion to create a stunning illusion! Credit to : MrUgleh (https://twitter.com/MrUgleh) for discovering the workflow :)</span>  
-        </p>
+        This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
+        Given a prompt and your pattern, we use a QR code conditioned controlnet to create a stunning illusion! Credit to: MrUgleh (https://twitter.com/MrUgleh) for discovering the workflow :)
 
         '''
     )
@@ -83,13 +101,14 @@ with gr.Blocks() as app:
     with gr.Row():
         with gr.Column():
             control_image = gr.Image(label="Input Illusion", type="pil")
+            controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=0.8, label="Illusion strength", info="ControlNet conditioning scale")
+            gr.Examples(examples=["checkers.png", "pattern.png", "spiral.jpeg"], inputs=control_image)
             prompt = gr.Textbox(label="Prompt")
             negative_prompt = gr.Textbox(label="Negative Prompt", value="ugly, disfigured, low quality, blurry, nsfw")
             with gr.Accordion(label="Advanced Options", open=False):
-                controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=1.1, label="Controlnet Conditioning Scale")
-                strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, value=0.9, label="Strength")
+                #strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, value=0.9, label="Strength")
                 guidance_scale = gr.Slider(minimum=0.0, maximum=50.0, step=0.25, value=7.5, label="Guidance Scale")
-                sampler = gr.Dropdown(choices=list(SAMPLER_MAP.keys()), value="DPM++ Karras SDE")
+                sampler = gr.Dropdown(choices=list(SAMPLER_MAP.keys()), value="Euler")
                 seed = gr.Slider(minimum=-1, maximum=9999999999, step=1, value=2313123, label="Seed", randomize=True)
             run_btn = gr.Button("Run")
         with gr.Column():
@@ -97,11 +116,11 @@ with gr.Blocks() as app:
             
     run_btn.click(
         inference,
-        inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, strength, seed, sampler],
+        inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, seed, sampler],
         outputs=[result_image]
     )
 
 app.queue(max_size=20)
 
 if __name__ == "__main__":
-    app.launch(debug=True)
+    app.launch()

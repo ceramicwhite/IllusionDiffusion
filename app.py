@@ -43,14 +43,17 @@ def inference(
     if prompt is None or prompt == "":
         raise gr.Error("Prompt is required")
     
-    control_image = control_image.resize((512, 512))
+    # Generate init_image using the "Realistic Vision V2.0" model
+    init_image = pipe(prompt, height=512, width=512).images[0]
     
+    control_image = control_image.resize((512, 512))
     pipe.scheduler = SAMPLER_MAP[sampler](pipe.scheduler.config)
     generator = torch.manual_seed(seed) if seed != -1 else torch.Generator()
     
     out = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
+        image=init_image,
         control_image=control_image,
         guidance_scale=guidance_scale,
         controlnet_conditioning_scale=controlnet_conditioning_scale,
@@ -94,5 +97,3 @@ app.queue(concurrency_count=4, max_size=20)
 
 if __name__ == "__main__":
     app.launch(debug=True)
-
-

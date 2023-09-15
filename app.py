@@ -68,14 +68,13 @@ with gr.Blocks() as app:
 
         <span style="color:blue; font-size:24px;">Illusion Diffusion 🌀</span>  
         <span style="color:black; font-size:16px;">Generate stunning illusion artwork with Stable Diffusion</span>  
-        <span style="color:black; font-size:10px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)**</span>  
+        <span style="color:black; font-size:10px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)</span>  
         
         </center>
 
         <p style="text-align:center;">
-        *This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).*
-        *Given a prompt, we generate an init image and pass that alongside the control illusion to create a stunning illusion!* 
-        *Credit to : [MrUgleh](https://twitter.com/MrUgleh) for discovering the workflow :)*
+        <span style="color:black; font-size:10px;">This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
+        Given a prompt, we generate an init image and pass that alongside the control illusion to create a stunning illusion! Credit to : MrUgleh (https://twitter.com/MrUgleh) for discovering the workflow :)</span>  
         </p>
 
         '''

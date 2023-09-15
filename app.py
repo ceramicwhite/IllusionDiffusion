@@ -51,7 +51,6 @@ def inference(
     out = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
-        image=None,
         control_image=control_image,
         guidance_scale=guidance_scale,
         controlnet_conditioning_scale=controlnet_conditioning_scale,

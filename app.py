@@ -90,6 +90,7 @@ with gr.Blocks() as app:
         <center><h1>Illusion Diffusion 🌀</h1></span>  
         <span font-size:16px;">Generate stunning illusion artwork with Stable Diffusion</span>  
         </center>
+ 
         A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)
 
         This project works by using [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).

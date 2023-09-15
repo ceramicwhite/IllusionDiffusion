@@ -3,35 +3,28 @@ import os
 import gradio as gr
 from PIL import Image
 from diffusers import (
-    StableDiffusionPipeline,
+    DiffusionPipeline,
     StableDiffusionControlNetImg2ImgPipeline,
     ControlNetModel,
-    DDIMScheduler,
-    DPMSolverMultistepScheduler,
-    DEISMultistepScheduler,
-    HeunDiscreteScheduler,
-    EulerDiscreteScheduler,
 )
 
-# Load controlnet model in float16 precision
-controlnet = ControlNetModel.from_pretrained(
-    "monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16
-)
-
-# Load the pipeline in float16 precision
-pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+# Initialize both pipelines
+init_pipe = DiffusionPipeline.from_pretrained("SG161222/Realistic_Vision_V2.0", torch_dtype=torch.float16).to("cuda")
+controlnet = ControlNetModel.from_pretrained("monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16)
+main_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
     "SG161222/Realistic_Vision_V2.0",
     controlnet=controlnet,
     safety_checker=None,
     torch_dtype=torch.float16,
 ).to("cuda")
-pipe.enable_xformers_memory_efficient_attention()
 
+# Sampler map
 SAMPLER_MAP = {
     "DPM++ Karras SDE": lambda config: DPMSolverMultistepScheduler.from_config(config, use_karras=True, algorithm_type="sde-dpmsolver++"),
     "Euler": lambda config: EulerDiscreteScheduler.from_config(config),
 }
 
+# Inference function
 def inference(
     control_image: Image.Image,
     prompt: str,
@@ -45,16 +38,15 @@ def inference(
     if prompt is None or prompt == "":
         raise gr.Error("Prompt is required")
     
-    # Generate init_image using the "Realistic Vision V2.0" model
-    init_image = pipe(prompt, height=512, width=512).images[0]
-    print("Init Image:", init_image)
-    assert init_image is not None, "init_image is None!"
-    
+    # Generate the initial image
+    init_image = init_pipe(prompt).images[0]
+
+    # Rest of your existing code
     control_image = control_image.resize((512, 512))
-    pipe.scheduler = SAMPLER_MAP[sampler](pipe.scheduler.config)
+    main_pipe.scheduler = SAMPLER_MAP[sampler](main_pipe.scheduler.config)
     generator = torch.manual_seed(seed) if seed != -1 else torch.Generator()
-    
-    out = pipe(
+
+    out = main_pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
         image=init_image,

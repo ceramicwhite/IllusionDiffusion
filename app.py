@@ -31,7 +31,7 @@ SAMPLER_MAP = {
 }
 
 def inference(
-    control_image: Image.Image,
+    control_image: control_image,
     prompt: str,
     negative_prompt: str,
     guidance_scale: float = 8.0,

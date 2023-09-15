@@ -31,7 +31,6 @@ SAMPLER_MAP = {
 }
 
 def inference(
-    input_image: Image.Image,
     prompt: str,
     negative_prompt: str,
     guidance_scale: float = 8.0,
@@ -51,7 +50,7 @@ def inference(
     out = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
-        image=input_image,
+        image=None,
         control_image=input_image,
         guidance_scale=float(guidance_scale),
         controlnet_conditioning_scale=float(controlnet_conditioning_scale),

@@ -66,9 +66,9 @@ with gr.Blocks() as app:
         '''
         <center>
 
-        <span style="color:blue; font-size:32px;"># Illusion Diffusion 🌀</span>  
-        <span style="color:black; font-size:24px;">## Generate stunning illusion artwork with Stable Diffusion</span>  
-        <span style="color:black; font-size:20px;">**A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)**</span>  
+        <span style="color:blue; font-size:32px;">Illusion Diffusion 🌀</span>  
+        <span style="color:black; font-size:24px;">Generate stunning illusion artwork with Stable Diffusion</span>  
+        <span style="color:black; font-size:20px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)**</span>  
         
         </center>
 

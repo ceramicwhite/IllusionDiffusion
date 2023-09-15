@@ -64,9 +64,20 @@ def inference(
 with gr.Blocks() as app:
     gr.Markdown(
         '''
-        # Illusion Diffusion 🌀
-        ## Generate stunning illusion artwork with Stable Diffusion
-        **[Follow me on Twitter](https://twitter.com/angrypenguinPNG)**
+        <center>
+
+        <span style="color:blue; font-size:32px;"># Illusion Diffusion 🌀</span>  
+        <span style="color:green; font-size:24px;">## Generate stunning illusion artwork with Stable Diffusion</span>  
+        <span style="color:purple; font-size:20px;">**A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)**</span>  
+        
+        </center>
+
+        <p style="text-align:center;">
+        This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
+        Given a prompt, we generate an init image and pass that alongside the control illusion to create a stunning illusion! 
+        Credit to : [MrUgleh](https://twitter.com/MrUgleh) for discovering the workflow :)
+        </p>
+
         '''
     )
     

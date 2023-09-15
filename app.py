@@ -18,7 +18,7 @@ controlnet = ControlNetModel.from_pretrained(
 )
 
 pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
-    "XpucT/Deliberate",
+    "SG161222/Realistic_Vision_V2.0",
     controlnet=controlnet,
     safety_checker=None,
     torch_dtype=torch.float16,
@@ -34,9 +34,9 @@ def inference(
     input_image: Image.Image,
     prompt: str,
     negative_prompt: str,
-    guidance_scale: float = 10.0,
-    controlnet_conditioning_scale: float = 1.1,
-    strength: float = 0.95,
+    guidance_scale: float = 8.0,
+    controlnet_conditioning_scale: float = 1,
+    strength: float = 0.9,
     seed: int = -1,
     sampler = "DPM++ Karras SDE",
 ):

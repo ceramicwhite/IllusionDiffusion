@@ -14,7 +14,7 @@ from diffusers import (
 )
 
 controlnet = ControlNetModel.from_pretrained(
-    "DionTimmer/controlnet_qrcode-control_v1p_sd15", torch_dtype=torch.float16
+    "monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16
 )
 
 pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
@@ -35,8 +35,8 @@ def inference(
     prompt: str,
     negative_prompt: str,
     guidance_scale: float = 10.0,
-    controlnet_conditioning_scale: float = 1.0,
-    strength: float = 0.8,
+    controlnet_conditioning_scale: float = 1.1,
+    strength: float = 0.95,
     seed: int = -1,
     sampler = "DPM++ Karras SDE",
 ):

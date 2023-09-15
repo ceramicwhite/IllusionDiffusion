@@ -101,7 +101,7 @@ with gr.Blocks() as app:
         outputs=[result_image]
     )
 
-app.queue(concurrency_count=4, max_size=20)
+app.queue(max_size=20)
 
 if __name__ == "__main__":
     app.launch(debug=True)

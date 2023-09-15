@@ -31,6 +31,7 @@ SAMPLER_MAP = {
 }
 
 def inference(
+    control_image: Image.Image,
     prompt: str,
     negative_prompt: str,
     guidance_scale: float = 8.0,
@@ -42,7 +43,7 @@ def inference(
     if prompt is None or prompt == "":
         raise gr.Error("Prompt is required")
     
-    input_image = input_image.resize((512, 512))
+    control_image = control_image.resize((512, 512))
     
     pipe.scheduler = SAMPLER_MAP[sampler](pipe.scheduler.config)
     generator = torch.manual_seed(seed) if seed != -1 else torch.Generator()
@@ -51,7 +52,7 @@ def inference(
         prompt=prompt,
         negative_prompt=negative_prompt,
         image=None,
-        control_image=input_image,
+        control_image=control_image,
         guidance_scale=float(guidance_scale),
         controlnet_conditioning_scale=float(controlnet_conditioning_scale),
         generator=generator,
@@ -71,7 +72,7 @@ with gr.Blocks() as app:
     
     with gr.Row():
         with gr.Column():
-            input_image = gr.Image(label="Input Illusion", type="pil")
+            control_image = gr.Image(label="Control Image", type="pil")
             prompt = gr.Textbox(label="Prompt")
             negative_prompt = gr.Textbox(label="Negative Prompt", value="ugly, disfigured, low quality, blurry, nsfw")
             with gr.Accordion(label="Advanced Options", open=False):
@@ -86,7 +87,7 @@ with gr.Blocks() as app:
             
     run_btn.click(
         inference,
-        inputs=[prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, strength, seed, sampler],
+        inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, strength, seed, sampler],
         outputs=[result_image]
     )
 

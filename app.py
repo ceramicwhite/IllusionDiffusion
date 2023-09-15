@@ -89,10 +89,10 @@ with gr.Blocks() as app:
         '''
         <center><h1>Illusion Diffusion 🌀</h1></span>  
         <span font-size:16px;">Generate stunning illusion artwork with Stable Diffusion</span>  
-        <span font-size:10px;">A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)</span>
         </center>
+        A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)
 
-        This project works by using the QR Control Net by Monster Labs: [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
+        This project works by using [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
         Given a prompt and your pattern, we use a QR code conditioned controlnet to create a stunning illusion! Credit to: MrUgleh (https://twitter.com/MrUgleh) for discovering the workflow :)
 
         '''

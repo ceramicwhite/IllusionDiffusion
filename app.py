@@ -13,10 +13,12 @@ from diffusers import (
     EulerDiscreteScheduler,
 )
 
+# Load controlnet model in float16 precision
 controlnet = ControlNetModel.from_pretrained(
     "monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16
 )
 
+# Load the pipeline in float16 precision
 pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
     "SG161222/Realistic_Vision_V2.0",
     controlnet=controlnet,

@@ -69,8 +69,9 @@ def inference(
 with gr.Blocks() as app:
     gr.Markdown(
         '''
-        # Illusion Diffusion
-        ## A simple UI for generating beatiful illusion art with Stable Diffusion 1.5
+        # Illusion Diffusion 🌀
+        ## Generate beautiful illusion art with SD 1.5.
+        **[Follow me on Twitter](https://twitter.com/angrypenguinPNG)**
         '''
     )
     

@@ -4,6 +4,7 @@ import gradio as gr
 from PIL import Image
 from diffusers import (
     DiffusionPipeline,
+    AutoencoderKL,
     StableDiffusionControlNetPipeline,
     ControlNetModel,
     StableDiffusionLatentUpscalePipeline,
@@ -11,18 +12,22 @@ from diffusers import (
     EulerDiscreteScheduler  # <-- Added import
 )
 
+BASE_MODEL = "SG161222/Realistic_Vision_V5.1_noVAE"
+
 # Initialize both pipelines
-init_pipe = DiffusionPipeline.from_pretrained("SG161222/Realistic_Vision_V2.0", torch_dtype=torch.float16).to("cuda")
+vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse")
+#init_pipe = DiffusionPipeline.from_pretrained("SG161222/Realistic_Vision_V5.1_noVAE", torch_dtype=torch.float16)
 controlnet = ControlNetModel.from_pretrained("monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16)
 main_pipe = StableDiffusionControlNetPipeline.from_pretrained(
-    "SG161222/Realistic_Vision_V2.0",
+    BASE_MODEL,
     controlnet=controlnet,
+    vae=vae,
     safety_checker=None,
     torch_dtype=torch.float16,
 ).to("cuda")
-model_id = "stabilityai/sd-x2-latent-upscaler"
-upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained(model_id, torch_dtype=torch.float16)
-upscaler.to("cuda")
+#model_id = "stabilityai/sd-x2-latent-upscaler"
+#upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+#upscaler.to("cuda")
 
 
 # Sampler map

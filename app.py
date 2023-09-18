@@ -129,7 +129,7 @@ with gr.Blocks(css=css) as app:
     run_btn.click(
         inference,
         inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, seed, sampler],
-        outputs=[result_image, share_button]
+        outputs=[result_image, share_group]
     )
     share_button.click(None, [], [], _js=share_js)
 app.queue(max_size=20)

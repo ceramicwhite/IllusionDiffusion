@@ -12,6 +12,7 @@ from diffusers import (
     EulerDiscreteScheduler  # <-- Added import
 )
 from share_btn import community_icon_html, loading_icon_html, share_js
+from gallery_history import fetch_gallery_history, show_gallery_history
 from illusion_style import css
 
 BASE_MODEL = "SG161222/Realistic_Vision_V5.1_noVAE"
@@ -125,11 +126,15 @@ with gr.Blocks(css=css) as app:
                 community_icon = gr.HTML(community_icon_html)
                 loading_icon = gr.HTML(loading_icon_html)
                 share_button = gr.Button("Share to community", elem_id="share-btn")
-            
+
+    history = show_gallery_history()
+
     run_btn.click(
         inference,
         inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, seed, sampler],
         outputs=[result_image, share_group]
+    ).then(
+        fn=fetch_gallery_history, inputs=[prompt, result_image], outputs=history
     )
     share_button.click(None, [], [], _js=share_js)
 app.queue(max_size=20)

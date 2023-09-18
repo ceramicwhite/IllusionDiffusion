@@ -6,3 +6,4 @@ xformers
 gradio
 Pillow
 qrcode
+filelock

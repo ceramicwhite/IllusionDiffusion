@@ -11,6 +11,8 @@ from diffusers import (
     DPMSolverMultistepScheduler,  # <-- Added import
     EulerDiscreteScheduler  # <-- Added import
 )
+from share_btn import community_icon_html, loading_icon_html, share_js
+from illusion_style import css
 
 BASE_MODEL = "SG161222/Realistic_Vision_V5.1_noVAE"
 
@@ -87,9 +89,9 @@ def inference(
         #output_type="latent"
     ).images[0]
     
-    return out
+    return out, gr.update(visible=True)
 
-with gr.Blocks() as app:
+with gr.Blocks(css=css) as app:
     gr.Markdown(
         '''
         <center><h1>Illusion Diffusion 🌀</h1></span>  
@@ -106,11 +108,11 @@ with gr.Blocks() as app:
     
     with gr.Row():
         with gr.Column():
-            control_image = gr.Image(label="Input Illusion", type="pil")
+            control_image = gr.Image(label="Input Illusion", type="pil", elem_id="control_image")
             controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=0.8, label="Illusion strength", info="ControlNet conditioning scale")
             gr.Examples(examples=["checkers.png", "pattern.png", "spiral.jpeg"], inputs=control_image)
-            prompt = gr.Textbox(label="Prompt")
-            negative_prompt = gr.Textbox(label="Negative Prompt", value="low quality")
+            prompt = gr.Textbox(label="Prompt", elem_id="prompt")
+            negative_prompt = gr.Textbox(label="Negative Prompt", value="low quality", elem_id="negative_prompt")
             with gr.Accordion(label="Advanced Options", open=False):
                 #strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, value=0.9, label="Strength")
                 guidance_scale = gr.Slider(minimum=0.0, maximum=50.0, step=0.25, value=7.5, label="Guidance Scale")
@@ -118,14 +120,18 @@ with gr.Blocks() as app:
                 seed = gr.Slider(minimum=-1, maximum=9999999999, step=1, value=2313123, label="Seed", randomize=True)
             run_btn = gr.Button("Run")
         with gr.Column():
-            result_image = gr.Image(label="Illusion Diffusion Output")
+            result_image = gr.Image(label="Illusion Diffusion Output", elem_id="output")
+            with gr.Group(elem_id="share-btn-container", visible=False) as share_group:
+                community_icon = gr.HTML(community_icon_html)
+                loading_icon = gr.HTML(loading_icon_html)
+                share_button = gr.Button("Share to community", elem_id="share-btn")
             
     run_btn.click(
         inference,
         inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, seed, sampler],
-        outputs=[result_image]
+        outputs=[result_image, share_button]
     )
-
+    share_button.click(None, [], [], _js=share_js)
 app.queue(max_size=20)
 
 if __name__ == "__main__":

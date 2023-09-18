@@ -60,8 +60,8 @@ share_js = """async () => {
     
     const descriptionMd = `
 ### Prompt
-- Prompt: `${inputPrompt}`
-- Negative prompt: `${negativePrompt}`
+- *Prompt*: ${inputPrompt}
+- *Negative prompt*: ${negativePrompt}
 
 #### Generated Image:
 <img src="${urlInputImg}" />

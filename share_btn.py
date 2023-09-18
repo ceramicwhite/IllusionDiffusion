@@ -41,6 +41,7 @@ share_js = """async () => {
     
     const inputPrompt = gradioEl.querySelector('#prompt textarea').value;
     const negativePrompt = gradioEl.querySelector('#negative_prompt textarea').value;
+    const illusionStrength = gradioEl.querySelector('#illusion_strength input[type="number"]').value;
     const controlImage = gradioEl.querySelector('#control_image img');
     const outputImgEl = gradioEl.querySelector('#output img');
     
@@ -62,7 +63,7 @@ share_js = """async () => {
 ### Prompt
 - *Prompt*: ${inputPrompt}
 - *Negative prompt*: ${negativePrompt}
-
+- *Illusion strength*: ${illusionStrength}
 #### Generated Image:
 <img src="${urlInputImg}" />
 
@@ -75,7 +76,7 @@ share_js = """async () => {
         preview: true
     });
 	const paramsStr = params.toString();
-	window.open(`https://huggingface.co/spaces/multimodalart/LoraTheExplorer/discussions/new?${paramsStr}`, '_blank');
+	window.open(`https://huggingface.co/spaces/AP123/IllusionDiffusion/discussions/new?${paramsStr}`, '_blank');
     shareBtnEl.style.removeProperty('pointer-events');
     shareIconEl.style.removeProperty('display');
     loadingIconEl.style.display = 'none';

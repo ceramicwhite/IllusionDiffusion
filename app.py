@@ -109,7 +109,7 @@ with gr.Blocks(css=css) as app:
     with gr.Row():
         with gr.Column():
             control_image = gr.Image(label="Input Illusion", type="pil", elem_id="control_image")
-            controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=0.8, label="Illusion strength", info="ControlNet conditioning scale")
+            controlnet_conditioning_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.01, value=0.8, label="Illusion strength", info="ControlNet conditioning scale", elem_id="illusion_strength")
             gr.Examples(examples=["checkers.png", "pattern.png", "spiral.jpeg"], inputs=control_image)
             prompt = gr.Textbox(label="Prompt", elem_id="prompt")
             negative_prompt = gr.Textbox(label="Negative Prompt", value="low quality", elem_id="negative_prompt")

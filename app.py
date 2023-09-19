@@ -2,6 +2,7 @@ import torch
 import os
 import gradio as gr
 from PIL import Image
+import random
 from diffusers import (
     DiffusionPipeline,
     AutoencoderKL,
@@ -110,8 +111,9 @@ def inference(
     # Rest of your existing code
     control_image_small = center_crop_resize(control_image)
     main_pipe.scheduler = SAMPLER_MAP[sampler](main_pipe.scheduler.config)
-    generator = torch.manual_seed(seed) if seed != -1 else torch.Generator()
-
+    my_seed = random.randint(0, 2**32 - 1) if seed == -1 else seed
+    generator = torch.manual_seed(my_seed)
+    
     out = main_pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
@@ -139,7 +141,7 @@ def inference(
         control_guidance_end=float(control_guidance_end),
         controlnet_conditioning_scale=float(controlnet_conditioning_scale)
     )
-    return out_image["images"][0], gr.update(visible=True)
+    return out_image["images"][0], gr.update(visible=True), my_seed
         
     #return out
 
@@ -170,7 +172,8 @@ with gr.Blocks(css=css) as app:
                 control_start = gr.Slider(minimum=0.0, maximum=1.0, step=0.1, value=0, label="Start of ControlNet")
                 control_end = gr.Slider(minimum=0.0, maximum=1.0, step=0.1, value=1, label="End of ControlNet")
                 strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.1, value=1, label="Strength of the upscaler")
-                seed = gr.Slider(minimum=-1, maximum=9999999999, step=1, value=-1, label="Seed", info="-1 means random seed", randomize=True)
+                seed = gr.Slider(minimum=-1, maximum=9999999999, step=1, value=-1, label="Seed", info="-1 means random seed")
+                used_seed = gr.Number(label="Last seed used",interactive=False)
             run_btn = gr.Button("Run")
         with gr.Column():
             result_image = gr.Image(label="Illusion Diffusion Output", interactive=False, elem_id="output")
@@ -180,11 +183,17 @@ with gr.Blocks(css=css) as app:
                 share_button = gr.Button("Share to community", elem_id="share-btn")
 
     history = show_gallery_history()
-    
+    prompt.submit(
+        inference,
+        inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, control_start, control_end, strength, seed, sampler],
+        outputs=[result_image, share_group, used_seed]
+    ).then(
+        fn=fetch_gallery_history, inputs=[prompt, result_image], outputs=history, queue=False
+    )
     run_btn.click(
         inference,
         inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, control_start, control_end, strength, seed, sampler],
-        outputs=[result_image, share_group]
+        outputs=[result_image, share_group, used_seed]
     ).then(
         fn=fetch_gallery_history, inputs=[prompt, result_image], outputs=history, queue=False
     )

@@ -134,7 +134,7 @@ with gr.Blocks(css=css) as app:
         inputs=[control_image, prompt, negative_prompt, guidance_scale, controlnet_conditioning_scale, seed, sampler],
         outputs=[result_image, share_group]
     ).then(
-        fn=fetch_gallery_history, inputs=[prompt, result_image], outputs=history
+        fn=fetch_gallery_history, inputs=[prompt, result_image], outputs=history, queue=False
     )
     share_button.click(None, [], [], _js=share_js)
 app.queue(max_size=20)

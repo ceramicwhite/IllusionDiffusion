@@ -4,6 +4,7 @@ accelerate
 torch
 xformers
 gradio
+gradio[oauth]
 Pillow
 qrcode
 filelock

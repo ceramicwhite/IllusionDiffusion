@@ -18,11 +18,22 @@ from share_btn import community_icon_html, loading_icon_html, share_js
 from gallery_history import fetch_gallery_history, show_gallery_history
 from illusion_style import css
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--share', action='store_true', help='Set this flag to enable sharing.')
+
+args = parser.parse_args()
+
 BASE_MODEL = "SG161222/Realistic_Vision_V5.1_noVAE"
+
+mps_device_value = os.getenv("MPS_DEVICE", "cuda")
+mps_device = torch.device(mps_device_value)
+
+#mps_device = torch.device("mps")
 
 # Initialize both pipelines
 vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=torch.float16)
-#init_pipe = DiffusionPipeline.from_pretrained("SG161222/Realistic_Vision_V5.1_noVAE", torch_dtype=torch.float16)
 controlnet = ControlNetModel.from_pretrained("monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16)#, torch_dtype=torch.float16)
 main_pipe = StableDiffusionControlNetPipeline.from_pretrained(
     BASE_MODEL,
@@ -30,15 +41,8 @@ main_pipe = StableDiffusionControlNetPipeline.from_pretrained(
     vae=vae,
     safety_checker=None,
     torch_dtype=torch.float16,
-).to("cuda")
-#main_pipe.unet = torch.compile(main_pipe.unet, mode="reduce-overhead", fullgraph=True)
-#main_pipe.unet.to(memory_format=torch.channels_last)
-#main_pipe.unet = torch.compile(main_pipe.unet, mode="reduce-overhead", fullgraph=True)
-#model_id = "stabilityai/sd-x2-latent-upscaler"
-image_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(BASE_MODEL, unet=main_pipe.unet, vae=vae, controlnet=controlnet, safety_checker=None, torch_dtype=torch.float16).to("cuda")
-#image_pipe.unet = torch.compile(image_pipe.unet, mode="reduce-overhead", fullgraph=True)
-#upscaler = StableDiffusionLatentUpscalePipeline.from_pretrained(model_id, torch_dtype=torch.float16)
-#upscaler.to("cuda")
+).to(mps_device)
+image_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(BASE_MODEL, unet=main_pipe.unet, vae=vae, controlnet=controlnet, safety_checker=None, torch_dtype=torch.float16).to(mps_device)
 
 
 # Sampler map
@@ -105,9 +109,6 @@ def inference(
     if prompt is None or prompt == "":
         raise gr.Error("Prompt is required")
     
-    # Generate the initial image
-    #init_image = init_pipe(prompt).images[0]
-
     # Rest of your existing code
     control_image_small = center_crop_resize(control_image)
     main_pipe.scheduler = SAMPLER_MAP[sampler](main_pipe.scheduler.config)
@@ -143,8 +144,6 @@ def inference(
     )
     return out_image["images"][0], gr.update(visible=True), my_seed
         
-    #return out
-
 with gr.Blocks(css=css) as app:
     gr.Markdown(
         '''
@@ -152,7 +151,7 @@ with gr.Blocks(css=css) as app:
         <span font-size:16px;">Generate stunning high quality illusion artwork with Stable Diffusion</span>  
         </center>
  
-        A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG) with big contributions from [multimodalart](https://twitter.com/multimodalart)
+        A space by AP [Follow me on Twitter](https://twitter.com/angrypenguinPNG)
 
         This project works by using [Monster Labs QR Control Net](https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster).
         Given a prompt and your pattern, we use a QR code conditioned controlnet to create a stunning illusion! Credit to: [MrUgleh](https://twitter.com/MrUgleh) for discovering the workflow :)
@@ -201,4 +200,4 @@ with gr.Blocks(css=css) as app:
 app.queue(max_size=20)
 
 if __name__ == "__main__":
-    app.launch()
+    app.launch(share=args.share)

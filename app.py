@@ -18,6 +18,9 @@ from share_btn import community_icon_html, loading_icon_html, share_js
 from gallery_history import fetch_gallery_history, show_gallery_history
 from illusion_style import css
 
+from safetensors import safe_open
+from dataset_and_utils import TokenEmbeddingsHandler
+
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -30,20 +33,29 @@ BASE_MODEL = "SG161222/Realistic_Vision_V5.1_noVAE"
 mps_device_value = os.getenv("MPS_DEVICE", "cuda")
 mps_device = torch.device(mps_device_value)
 
-#mps_device = torch.device("mps")
-
 # Initialize both pipelines
 vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=torch.float16)
 controlnet = ControlNetModel.from_pretrained("monster-labs/control_v1p_sd15_qrcode_monster", torch_dtype=torch.float16)#, torch_dtype=torch.float16)
 main_pipe = StableDiffusionControlNetPipeline.from_pretrained(
     BASE_MODEL,
     controlnet=controlnet,
+    lora=TokenEmbeddingsHandler(),
     vae=vae,
     safety_checker=None,
     torch_dtype=torch.float16,
 ).to(mps_device)
-image_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(BASE_MODEL, unet=main_pipe.unet, vae=vae, controlnet=controlnet, safety_checker=None, torch_dtype=torch.float16).to(mps_device)
 
+image_pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+     BASE_MODEL, 
+     unet=main_pipe.unet, 
+     vae=vae, controlnet=controlnet, 
+     safety_checker=None, 
+     torch_dtype=torch.float16,
+).to(mps_device)
+
+with safe_open("trained/unet.safetensors", framework="pt", device="mps_device") as f:
+    for key in f.keys():
+       tensors[key] = f.get_tensor(key)
 
 # Sampler map
 SAMPLER_MAP = {

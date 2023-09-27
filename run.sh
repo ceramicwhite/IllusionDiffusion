@@ -23,8 +23,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     pip install --upgrade pip
     pip install --upgrade setuptools wheel
     pip install -r requirements.txt
-    pip uninstall -y torch torchvision torchaudio
-    pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+    pip uninstall -y torch torchvision
+    pip install --pre torch torchvision --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 else
     echo "Setting up for Linux..."
     

@@ -1,0 +1,19 @@
+import torch
+from PIL import Image
+from diffusers import AutoencoderKL, ControlNetModel, EulerDiscreteScheduler
+from diffusers import StableDiffusionControlNetPipeline
+import argparse
+
+CACHE_DIR = "./hf-cache"
+
+vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse")
+controlnet = ControlNetModel.from_pretrained(
+    "monster-labs/control_v1p_sd15_qrcode_monster"
+)
+pipe = StableDiffusionControlNetPipeline.from_pretrained(
+    "SG161222/Realistic_Vision_V5.1_noVAE",
+    controlnet=controlnet,
+    vae=vae,
+    safety_checker=None,
+).to("cuda")
+pipe.save_pretrained(CACHE_DIR, safe_serialization=True)
